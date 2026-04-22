@@ -1,14 +1,12 @@
 package com.microservice.accounts.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Table(name = "customers")
 @Getter @Setter @ToString @AllArgsConstructor @NoArgsConstructor
-public class Customers extends BaseEntity {
+public class Customer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long customerId;
