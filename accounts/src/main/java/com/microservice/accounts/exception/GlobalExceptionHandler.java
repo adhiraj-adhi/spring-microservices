@@ -42,4 +42,19 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(errorResponseDto, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(Exception.class) // this will be matched as handling
+    // code when there is no exception matched.
+    public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception exception,
+                                                                            WebRequest webRequest) {
+        // we are using WebRequest to get hold of path which we will return as part of ErrorResponseDto
+
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(
+                webRequest.getDescription(false),
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                exception.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
