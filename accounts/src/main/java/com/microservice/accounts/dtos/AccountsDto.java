@@ -1,5 +1,6 @@
 package com.microservice.accounts.dtos;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -7,7 +8,14 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
+@Schema(
+        name = "Accounts",
+        description = "Schema to hold Account information"
+)
 public class AccountsDto {
+    @Schema(
+            description = "Account Number of the Customer"
+    )
     @NotNull(message = "Account Number can not be null")
 //    @Pattern(regexp = "[0-9]{10}", message = "Account number must be 10 digits") - can be used only with String
     @Min(1000000000L)
@@ -18,9 +26,15 @@ public class AccountsDto {
     // go with String type for account number and use @Pattern annotation.
     private Long accountNumber;
 
+    @Schema(
+            description = "Account type of the Customer", example = "Savings"
+    )
     @NotEmpty(message = "Account type can not be null or empty")
     private String accountType;
 
+    @Schema(
+            description = "Branch Address of the Customer"
+    )
     @NotEmpty(message = "Branch Address can not be null or empty")
     private String branchAddress;
 }
