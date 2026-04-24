@@ -37,10 +37,19 @@ public class AccountsController {
             summary = "Create Account REST API",
             description = "REST API to create new Customer & Account inside XYZ Bank"
     )
-    @ApiResponse(
-            responseCode = "201",
-            description = "HTTP Status CREATED"
-    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "HTTP Status CREATED"
+            ),
+            @ApiResponse( // when there is internal server error
+                    responseCode = "500",
+                    description = "HTTP Status INTERNAL SERVER ERROR",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    })
     @PostMapping("/create")
     public ResponseEntity<ResponseDto> createAccount(@Valid @RequestBody CustomerDto customerDto) {
         iAccountsService.createAccount(customerDto);
@@ -53,10 +62,19 @@ public class AccountsController {
             summary = "Fetch Account Details REST API",
             description = "REST API to fetch Customer & Account details based on a mobile number"
     )
-    @ApiResponse(
-            responseCode = "200",
-            description = "HTTP Status OK"
-    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTTP Status OK"
+            ),
+            @ApiResponse( // when there is internal server error
+                    responseCode = "500",
+                    description = "HTTP Status INTERNAL SERVER ERROR",
+                    content = @Content(
+                            schema = @Schema(implementation = ErrorResponseDto.class)
+                    )
+            )
+    })
     @GetMapping("/fetch")
     public ResponseEntity<CustomerAccountsDto> fetchAccountDetails(@RequestParam
                 @Pattern(regexp = "[0-9]{10}", message = "Mobile Number must be 10 digits")
@@ -70,18 +88,20 @@ public class AccountsController {
             summary = "Update Account Details REST API",
             description = "REST API to update Customer & Account details based on account number"
     )
-    @ApiResponses({  // we are returning two types of response
+    @ApiResponses({  // we are returning three types of response
             @ApiResponse(
                     responseCode = "200",
                     description = "HTTP Status OK"
             ),
             @ApiResponse(
                     responseCode = "417",
+                    description = "HTTP Status EXPECTATION FAILED"
+            ),
+            @ApiResponse( // when there is internal server error
+                    responseCode = "500",
                     description = "HTTP Status INTERNAL SERVER ERROR",
                     content = @Content(
                             schema = @Schema(implementation = ErrorResponseDto.class)
-                            // This DTO is now part of API contract and hence swagger will
-                            // add it to Schemas section
                     )
             )
     })
@@ -112,6 +132,10 @@ public class AccountsController {
             ),
             @ApiResponse(
                     responseCode = "417",
+                    description = "HTTP Status EXPECTATION FAILED"
+            ),
+            @ApiResponse(  // when there is internal server error
+                    responseCode = "500",
                     description = "HTTP Status INTERNAL SERVER ERROR",
                     content = @Content(
                             schema = @Schema(implementation = ErrorResponseDto.class)
