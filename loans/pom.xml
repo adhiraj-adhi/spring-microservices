@@ -10,7 +10,9 @@
 	</parent>
 	<groupId>com.microservices</groupId>
 	<artifactId>loans</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+<!--	<version>0.0.1-SNAPSHOT</version>-->
+	<version>0.0.1</version> <!-- Updated version to remove SNAPSHOT suffix -->
+	<packaging>jar</packaging>
 	<name/>
 	<description/>
 	<url/>
@@ -99,6 +101,11 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<image>
+						<name>abhinavyishu/${project.artifactId}:${project.version}</name>
+					</image>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

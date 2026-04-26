@@ -10,7 +10,9 @@
 	</parent>
 	<groupId>com.microservices</groupId>
 	<artifactId>cards</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+<!--	<version>0.0.1-SNAPSHOT</version>-->
+	<version>0.0.1</version> <!-- Remove the -SNAPSHOT suffix -->
+	<packaging>jar</packaging>
 	<name/>
 	<description/>
 	<url/>
@@ -99,6 +101,16 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.5.1</version>
+				<configuration>
+					<to>
+						<image>abhinavyishu/${project.artifactId}:${project.version}</image>
+					</to>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

@@ -1,0 +1,39 @@
+services:
+  accounts:
+    image: "abhinavyishu/accounts:v0.1"
+    container_name: "accounts-ms"
+    ports:
+      - "8081:8081"
+    deploy:  # Not effective in docker-compose, but can be used in Docker Swarm
+      resources:
+        limits:
+          memory: 700M
+    networks:
+      - XYZBank
+  loans:
+    image: "abhinavyishu/loans:0.0.1"
+    container_name: "loans-ms"
+    ports:
+      - "8091:8091"
+    deploy: # Not effective in docker-compose, but can be used in Docker Swarm
+      resources:
+        limits:
+          memory: 700M
+    networks:
+      - XYZBank
+  cards:
+    image: "abhinavyishu/cards:0.0.1"
+    container_name: "cards-ms"
+    ports:
+      - "9002:9002"
+    deploy: # Not effective in docker-compose, but can be used in Docker Swarm
+      resources:
+        limits:
+          memory: 700M
+    networks:
+      - XYZBank
+
+# defining the network
+networks:  # Not needed but let us define it for better isolation and communication between services
+    XYZBank:
+        driver: bridge
