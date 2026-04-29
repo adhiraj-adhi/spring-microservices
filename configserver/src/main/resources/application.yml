@@ -4,9 +4,15 @@ spring:
   application:
     name: configserver
   profiles:
-    active: native # This means that the configuration will be read from the local file system
+    active: git
   cloud:
     config:
       server:
-        native:
-          search-locations: classpath:/config # This is the location where we will store the configuration files
+        git:
+          uri: "https://github.com/adhiraj-adhi/spring-microservices-config-repo.git"
+          default-label: main
+          timeout: 5
+          clone-on-start: true
+          force-pull: true
+encrypt:
+  key: "OurSuperComplexRandomSecretKey"
