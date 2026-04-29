@@ -1,0 +1,12 @@
+server:
+  port: 8071
+spring:
+  application:
+    name: configserver
+  profiles:
+    active: native # This means that the configuration will be read from the local file system
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config # This is the location where we will store the configuration files

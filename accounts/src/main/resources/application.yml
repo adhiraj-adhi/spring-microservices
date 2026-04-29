@@ -1,8 +1,9 @@
 server:
-  port: 8081
+  port: 8081  # will remain same on all environments
 spring:
   application:
-    name: accounts
+    name: accounts  # will remain same on all environments
+  # For now let us assume database related properties are same across all environments
   datasource:
     url: jdbc:h2:mem:testdb
     driverClassName: org.h2.Driver
@@ -16,3 +17,10 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  profiles:
+    active: qa  # setting qa as active profile
+  config:
+    import: "optional:configserver:http://localhost:8071"  # Importing configuration from config server
+
+# optional:: Prevents the microservice from failing to start if the Config Server is offline (a warning will be logged instead).
+# configserver:: A mandatory prefix required by Spring Boot to recognize the URL as a Config Server endpoint.

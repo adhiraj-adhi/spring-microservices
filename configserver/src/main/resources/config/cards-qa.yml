@@ -1,0 +1,10 @@
+build:
+  version: 2.0
+accounts:
+  message: "Welcome to Cards Service! - QA Environment"
+  contactDetails:
+    name: "Smitha Ray - QA-Lead"
+    email: "smitha@xyzbank.com"
+  onCallSupport:
+    - (666) 666-1234
+    - (666) 666-5678

@@ -1,0 +1,10 @@
+build:
+  version: 1.0
+accounts:
+  message: "Welcome to Cards Service! - Prod Environment"
+  contactDetails:
+    name: "James Adam - Production Support"
+    email: "james@xyzbank.com"
+  onCallSupport:
+    - (777) 777-1234
+    - (777) 777-5678
