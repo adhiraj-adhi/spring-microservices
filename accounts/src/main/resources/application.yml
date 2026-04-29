@@ -24,3 +24,9 @@ spring:
 
 # optional:: Prevents the microservice from failing to start if the Config Server is offline (a warning will be logged instead).
 # configserver:: A mandatory prefix required by Spring Boot to recognize the URL as a Config Server endpoint.
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  # Exposing all actuator endpoints (we can expose specific endpoints in production for security reasons)

@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableJpaAuditing(auditorAwareRef = "auditAwareImpl")
-@EnableConfigurationProperties(value = {ConfigPropertiesDTO.class})
+//@EnableConfigurationProperties(value = {ConfigPropertiesDTO.class}) // not needed as we are using class instead of record
 @OpenAPIDefinition(
 		info = @Info(
 				title = "Loans microservice REST API Documentation",
