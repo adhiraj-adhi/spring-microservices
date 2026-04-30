@@ -27,4 +27,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"  # We can also expose just monitor endpoint
+        include: "*" # because we were also using the endpoints like /monitor, /encrypt,
+        # /decrypt endpoints.
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
