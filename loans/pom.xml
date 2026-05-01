@@ -10,8 +10,7 @@
 	</parent>
 	<groupId>com.microservices</groupId>
 	<artifactId>loans</artifactId>
-<!--	<version>0.0.1-SNAPSHOT</version>-->
-	<version>0.0.1</version> <!-- Updated version to remove SNAPSHOT suffix -->
+	<version>v1.0</version>
 	<packaging>jar</packaging>
 	<name/>
 	<description/>
@@ -122,10 +121,15 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.5.1</version>
 				<configuration>
-					<image>
-						<name>abhinavyishu/${project.artifactId}:${project.version}</name>
-					</image>
+					<to>
+						<image>abhinavyishu/${project.artifactId}:${project.version}</image>
+					</to>
 				</configuration>
 			</plugin>
 		</plugins>

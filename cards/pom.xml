@@ -10,8 +10,7 @@
 	</parent>
 	<groupId>com.microservices</groupId>
 	<artifactId>cards</artifactId>
-<!--	<version>0.0.1-SNAPSHOT</version>-->
-	<version>0.0.1</version> <!-- Remove the -SNAPSHOT suffix -->
+	<version>v1.0</version>
 	<packaging>jar</packaging>
 	<name/>
 	<description/>
