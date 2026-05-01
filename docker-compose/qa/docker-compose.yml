@@ -8,35 +8,18 @@ x-microservice-base-config: &microservice-base-config
     resources:
       limits:
         memory: 700M
-  environment:
-    SPRING_RABBITMQ_HOST: "rabbit"
 
 x-microservice-config: &microservice-config
   depends_on:
     configserver:
       condition: service_healthy
   environment:
-    SPRING_RABBITMQ_HOST: "rabbit"
     SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
     SPRING_PROFILES_ACTIVE: "qa"
 # defining common-config ends here
 
 # our service definitions start here:
 services:
-  rabbit:
-    <<: *network-deploy-service # will add the network configuration to this service
-    image: "rabbitmq:3.13-management"
-    container_name: "rabbitmq"
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-
   configserver:
     <<: [*network-deploy-service, *microservice-base-config] # will add both network
     # and base-config resource configuration to this service
@@ -44,9 +27,6 @@ services:
     container_name: "configserver-ms"
     ports:
       - "8071:8071"
-    depends_on:
-      rabbit:
-        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8071/actuator/health/readiness"]
       interval: 10s
@@ -56,17 +36,13 @@ services:
 
 
   accounts:
-#    <<: [*network-deploy-service, *microservice-base-config, *microservice-config]
     <<: [*microservice-config, *microservice-base-config, *network-deploy-service]
-    # the above will add network, base-config and microservice-config configuration
-    # to this service
     image: "abhinavyishu/accounts:v1.0"
     container_name: "accounts-ms"
     ports:
       - "8081:8081"
 
   loans:
-#    <<: [*network-deploy-service, *microservice-base-config, *microservice-config]
     <<: [*microservice-config, *microservice-base-config, *network-deploy-service]
     image: "abhinavyishu/loans:v1.0"
     container_name: "loans-ms"
@@ -74,7 +50,6 @@ services:
       - "8091:8091"
 
   cards:
-#    <<: [*network-deploy-service, *microservice-base-config, *microservice-config]
     <<: [*microservice-config, *microservice-base-config, *network-deploy-service]
     image: "abhinavyishu/cards:v1.0"
     container_name: "cards-ms"

@@ -20,11 +20,6 @@ spring:
     active: qa
   config:
     import: "optional:configserver:http://localhost:8071"
-  rabbitmq:  # This is not required if we are using default RabbitMQ properties, but we are defining it here for clarity and future modifications
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
 
 management:
   endpoints:
