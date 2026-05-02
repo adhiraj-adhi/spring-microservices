@@ -26,3 +26,24 @@ management:
     web:
       exposure:
         include: "*"  # Exposing all actuator endpoints (we can expose specific endpoints in production for security reasons)
+  endpoint:
+    shutdown:
+      enabled: true  # Enable shutdown endpoint
+  info:
+    env:
+      enabled: true  # Enable environment info in actuator endpoints
+
+eureka:
+  client:
+    register-with-eureka: true  # Enable registration with Eureka server
+    fetch-registry: true  # Enable fetching registry information from Eureka server
+    service-url:
+      defaultZone: http://localhost:8070/eureka/  # Eureka server URL
+  instance:
+    prefer-ip-address: true  # Prefer IP address over hostname for service registration
+
+info:
+  app:
+    name: cards-service
+    description: "XYZ Bank Cards Application"
+    version: 1.0.0
