@@ -4,60 +4,80 @@ x-network-deploy-service: &network-deploy-service
     - XYZBank
 
 x-microservice-base-config: &microservice-base-config
+  <<: *network-deploy-service
   deploy:
     resources:
       limits:
         memory: 700M
 
+x-healthcheck: &healthcheck
+  interval: 10s
+  timeout: 5s
+  retries: 10
+  start_period: 10s
+
 x-microservice-config: &microservice-config
   depends_on:
     configserver:
       condition: service_healthy
+    eurekaserver:
+      condition: service_healthy
   environment:
     SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
     SPRING_PROFILES_ACTIVE: "prod"
+    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
+
+x-complete-microservice-config: &complete-microservice-config
+  <<: [*microservice-config, *microservice-base-config]
 # defining common-config ends here
 
 # our service definitions start here:
 services:
   configserver:
-    <<: [*network-deploy-service, *microservice-base-config] # will add both network
-    # and base-config resource configuration to this service
-    image: "abhinavyishu/configserver:v1.0"
+    <<: *microservice-base-config
+    image: "abhinavyishu/configserver:v2.0"
     container_name: "configserver-ms"
     ports:
       - "8071:8071"
     healthcheck:
+      <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8071/actuator/health/readiness"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
 
+  eurekaserver:
+    <<: *microservice-base-config
+    image: "abhinavyishu/eurekaserver:v2.0"
+    container_name: "eurekaserver-ms"
+    ports:
+      - "8070:8070"
+    depends_on:
+      configserver:
+        condition: service_healthy
+    healthcheck:
+      <<: *healthcheck
+      test: [ "CMD", "curl", "-f", "http://localhost:8070/actuator/health/readiness" ]
+    environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
 
   accounts:
-    <<: [*microservice-config, *microservice-base-config, *network-deploy-service]
-    image: "abhinavyishu/accounts:v1.0"
+    <<: *complete-microservice-config
+    image: "abhinavyishu/accounts:v2.0"
     container_name: "accounts-ms"
     ports:
       - "8081:8081"
 
   loans:
-    <<: [*microservice-config, *microservice-base-config, *network-deploy-service]
-    image: "abhinavyishu/loans:v1.0"
+    <<: *complete-microservice-config
+    image: "abhinavyishu/loans:v2.0"
     container_name: "loans-ms"
     ports:
       - "8091:8091"
 
   cards:
-    <<: [*microservice-config, *microservice-base-config, *network-deploy-service]
-    image: "abhinavyishu/cards:v1.0"
+    <<: *complete-microservice-config
+    image: "abhinavyishu/cards:v2.0"
     container_name: "cards-ms"
     ports:
       - "9002:9002"
-
-  # our service definitions end here, we can also add other services below in the
-  # future if needed.
 
 # defining the network
 networks:
