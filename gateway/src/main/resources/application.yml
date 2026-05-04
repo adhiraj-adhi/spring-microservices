@@ -10,10 +10,18 @@ spring:
     gateway:
       server:
         webflux:
-          discovery:
-            locator:
-              enabled: true  # Enable service discovery for the gateway to automatically route to registered services.
-              lower-case-service-id: true  # Convert service IDs to lower case for consistent routing.
+          routes:
+            - id: account-service # Just a unique name for the route.
+              uri: lb://ACCOUNTS  # Use load-balanced URI to route to the account service.
+              predicates:
+                - Path=/xyzbank/accounts/api/**  # Route requests with /accounts/** to the account service.
+              filters:
+                - StripPrefix=2  # Remove the first part of the path before forwarding to the service.
+              order: -1  # Set the order of the route (optional, default is 0). Lower values have higher precedence.
+#          discovery:
+#            locator:
+#              enabled: true  # Enable service discovery for the gateway to automatically route to registered services.
+#              lower-case-service-id: true  # Convert service IDs to lower case for consistent routing.
 
 
 management:
