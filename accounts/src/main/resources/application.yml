@@ -22,6 +22,10 @@ spring:
     active: qa  # setting qa as active profile
   config:
     import: "optional:configserver:http://localhost:8071"  # Importing configuration from config server
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true  # Enable circuit breaker for Feign clients
 
 management:
   endpoints:
@@ -61,3 +65,11 @@ info:
 logging:
   level:
     com.microservice.accounts: DEBUG
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000

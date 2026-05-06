@@ -11,17 +11,17 @@ spring:
       server:
         webflux:
           routes:
-            - id: account-service # Just a unique name for the route.
-              uri: lb://ACCOUNTS  # Use load-balanced URI to route to the account service.
+            - id: account-service
+              uri: lb://ACCOUNTS
               predicates:
-                - Path=/xyzbank/accounts/api/**  # Route requests with /accounts/** to the account service.
+                - Path=/xyzbank/accounts/api/**
               filters:
-                - StripPrefix=2  # Remove the first part of the path before forwarding to the service.
-              order: -1  # Set the order of the route (optional, default is 0). Lower values have higher precedence.
-#          discovery:
-#            locator:
-#              enabled: true  # Enable service discovery for the gateway to automatically route to registered services.
-#              lower-case-service-id: true  # Convert service IDs to lower case for consistent routing.
+                - StripPrefix=2
+                - name: CircuitBreaker
+                  args:
+                    name: accountsCircuitBreaker
+                    fallbackUri: forward:/contactSupport
+              order: -1
 
 
 management:
@@ -48,3 +48,16 @@ info:
 logging:
   level:
     com.microservices.gateway: DEBUG
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default: # We can define configuration for a particular circuit breaker by replacing 'default' with the name of the circuit breaker (e.g., accountsCircuitBreaker)
+        slidingWindowSize: 6
+        permittedNumberOfCallsInHalfOpenState: 2
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000 # 10 seconds before moving to half-open state
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 5000 # 5 seconds timeout for calls to downstream services

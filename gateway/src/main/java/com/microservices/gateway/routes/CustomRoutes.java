@@ -15,14 +15,21 @@ public class CustomRoutes {
                         .path("/xyzbank/cards/api/**")
                         .filters(f -> f
                                 .stripPrefix(2)
-                                // .otherFilter()
+                                .circuitBreaker(config -> config
+                                        .setName("cardsCircuitBreaker")
+                                        .setFallbackUri("forward:/contactSupport"))
                         )
                         .uri("lb://CARDS")
                 )
                 .route("loans-service", p -> p
                         .order(-1)
                         .path("/xyzbank/loans/api/**")
-                        .filters(f -> f.rewritePath("/xyzbank/loans/(?<segment>.*)", "/${segment}"))
+                        .filters(f -> f
+                                .rewritePath("/xyzbank/loans/(?<segment>.*)", "/${segment}")
+                                .circuitBreaker(config -> config
+                                        .setName("loansCircuitBreaker")
+                                        .setFallbackUri("forward:/contactSupport"))
+                        )
                         .uri("lb://LOANS")
                 ).build();
     }
