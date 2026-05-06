@@ -11,13 +11,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(
@@ -28,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @Validated
 public class CustomersController {
+    private static final Logger logger = LoggerFactory.getLogger(CustomersController.class);
     private ICustomerService iCustomerService;
 
     @Operation(
@@ -48,10 +48,13 @@ public class CustomersController {
             )
     })
     @GetMapping("/fetchCustomerDetails")
-    public ResponseEntity<CustomerDetailsDto> fetchCustomerDetails(@RequestParam
+    public ResponseEntity<CustomerDetailsDto> fetchCustomerDetails(
+            @RequestHeader(name = "xyz_bank_correlation_id") String correlationIdToken,
+            @RequestParam
             @Pattern(regexp = "[0-9]{10}", message = "Mobile Number must be 10 digits")
             String mobileNumber) {
-        CustomerDetailsDto customerDetailsDto = iCustomerService.fetchCompleteCustomerDetails(mobileNumber);
+        logger.debug("Token with Correlation ID xyz_bank_correlation_id: {}", correlationIdToken);
+        CustomerDetailsDto customerDetailsDto = iCustomerService.fetchCompleteCustomerDetails(correlationIdToken, mobileNumber);
         return ResponseEntity.ok(customerDetailsDto);
     }
 }

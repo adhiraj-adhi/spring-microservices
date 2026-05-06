@@ -29,13 +29,27 @@ x-microservice-config: &microservice-config
 
 x-complete-microservice-config: &complete-microservice-config
   <<: [*microservice-config, *microservice-base-config]
+
+x-gateway-config: &gateway-config
+  <<: *microservice-base-config
+  depends_on:
+    accounts:
+      condition: service_healthy
+    loans:
+      condition: service_healthy
+    cards:
+      condition: service_healthy
+  environment:
+    SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
+    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
+
 # defining common-config ends here
 
 # our service definitions start here:
 services:
   configserver:
     <<: *microservice-base-config
-    image: "abhinavyishu/configserver:v2.0"
+    image: "abhinavyishu/configserver:v3.0"
     container_name: "configserver-ms"
     ports:
       - "8071:8071"
@@ -45,7 +59,7 @@ services:
 
   eurekaserver:
     <<: *microservice-base-config
-    image: "abhinavyishu/eurekaserver:v2.0"
+    image: "abhinavyishu/eurekaserver:v3.0"
     container_name: "eurekaserver-ms"
     ports:
       - "8070:8070"
@@ -60,24 +74,40 @@ services:
 
   accounts:
     <<: *complete-microservice-config
-    image: "abhinavyishu/accounts:v2.0"
+    image: "abhinavyishu/accounts:v3.0"
     container_name: "accounts-ms"
     ports:
       - "8081:8081"
+    healthcheck:
+      <<: *healthcheck
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health/readiness" ]
 
   loans:
     <<: *complete-microservice-config
-    image: "abhinavyishu/loans:v2.0"
+    image: "abhinavyishu/loans:v3.0"
     container_name: "loans-ms"
     ports:
       - "8091:8091"
+    healthcheck:
+      <<: *healthcheck
+      test: [ "CMD", "curl", "-f", "http://localhost:8091/actuator/health/readiness" ]
 
   cards:
     <<: *complete-microservice-config
-    image: "abhinavyishu/cards:v2.0"
+    image: "abhinavyishu/cards:v3.0"
     container_name: "cards-ms"
     ports:
       - "9002:9002"
+    healthcheck:
+      <<: *healthcheck
+      test: [ "CMD", "curl", "-f", "http://localhost:9002/actuator/health/readiness" ]
+
+  gateway:
+    <<: *gateway-config
+    image: "abhinavyishu/gateway:v3.0"
+    container_name: "gateway-ms"
+    ports:
+      - "8072:8072"
 
 # defining the network
 networks:

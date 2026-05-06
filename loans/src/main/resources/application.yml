@@ -29,9 +29,17 @@ management:
   endpoint:
     shutdown:
       enabled: true  # Enable shutdown endpoint
+    health:
+      probes:
+        enabled: true
   info:
     env:
       enabled: true  # Enable environment info in actuator endpoints
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
 
 eureka:
   client:
@@ -47,3 +55,7 @@ info:
     name: loans-service
     description: "XYZ Bank Loans Application"
     version: 1.0.0
+
+logging:
+  level:
+    com.microservices.loans: DEBUG

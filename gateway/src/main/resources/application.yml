@@ -43,3 +43,8 @@ info:
     name: gateway-service
     description: "XYZ Bank Gateway Application"
     version: 1.0.0
+
+
+logging:
+  level:
+    com.microservices.gateway: DEBUG

@@ -23,11 +23,12 @@ public class CustomerServiceImpl implements ICustomerService {
     private CardsFeignClient cardsFeignClient;
     private LoansFeignClient loansFeignClient;
     /**
-     * @param mobileNumber - String Object
+     * @param correlationIdToken
+     * @param mobileNumber       - String Object
      * @return Customer Complete Details based on a given mobileNumber
      */
     @Override
-    public CustomerDetailsDto fetchCompleteCustomerDetails(String mobileNumber) {
+    public CustomerDetailsDto fetchCompleteCustomerDetails(String correlationIdToken, String mobileNumber) {
         Customer customer = customersRepository.findByMobileNumber(mobileNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer", "mobileNumber", mobileNumber));
         Accounts accounts = accountsRepository.findByCustomerId(customer.getCustomerId())
@@ -39,11 +40,11 @@ public class CustomerServiceImpl implements ICustomerService {
         customerDetailsDto.setCustomerDto(CustomerMapper.mapToCustomerDto(customer, new CustomerDto()));
         customerDetailsDto.setAccountsDto(AccountsMapper.mapToAccountsDto(accounts, new AccountsDto()));
 
-        ResponseEntity<CardsDto> cardsDtoResponseEntity = cardsFeignClient.fetchCardDetails(mobileNumber);
+        ResponseEntity<CardsDto> cardsDtoResponseEntity = cardsFeignClient.fetchCardDetails(correlationIdToken, mobileNumber);
         customerDetailsDto.setCardsDto(cardsDtoResponseEntity.getBody());
 
 
-        ResponseEntity<LoansDto> loansDtoResponseEntity = loansFeignClient.fetchLoanDetails(mobileNumber);
+        ResponseEntity<LoansDto> loansDtoResponseEntity = loansFeignClient.fetchLoanDetails(correlationIdToken, mobileNumber);
         customerDetailsDto.setLoansDto(loansDtoResponseEntity.getBody());
 
         return customerDetailsDto;
