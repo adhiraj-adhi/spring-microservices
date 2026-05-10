@@ -73,3 +73,9 @@ resilience4j:
         slidingWindowSize: 10
         failureRateThreshold: 50
         waitDurationInOpenState: 10000
+  ratelimiter:
+    configs:
+      default:
+        limitForPeriod: 1  # maximum number of requests allowed within a specific time window.
+        limitRefreshPeriod: 5s # defines the "Window" of time. Every 5 seconds, the counter resets back to zero.
+        timeoutDuration: 1s # maximum time to wait for permission to execute a request when the limit has been reached. If the timeout is exceeded, a RequestNotPermitted exception is thrown.
