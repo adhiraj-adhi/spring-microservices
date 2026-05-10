@@ -1,5 +1,7 @@
 package com.microservices.gateway.routes;
 
+import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -7,6 +9,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class CustomRoutes {
+    private RedisRateLimiter redisRateLimiter;
+    private KeyResolver keyResolver;
+    public CustomRoutes(RedisRateLimiter redisRateLimiter, KeyResolver keyResolver) {
+        this.redisRateLimiter = redisRateLimiter;
+        this.keyResolver = keyResolver;
+    }
     @Bean
     public RouteLocator routeLocatorBean(RouteLocatorBuilder builder) {
         return builder.routes()
@@ -15,9 +23,9 @@ public class CustomRoutes {
                         .path("/xyzbank/cards/api/**")
                         .filters(f -> f
                                 .stripPrefix(2)
-                                .circuitBreaker(config -> config
-                                        .setName("cardsCircuitBreaker")
-                                        .setFallbackUri("forward:/contactSupport"))
+                                .requestRateLimiter(config -> config
+                                        .setRateLimiter(redisRateLimiter)
+                                        .setKeyResolver(keyResolver))
                         )
                         .uri("lb://CARDS")
                 )
