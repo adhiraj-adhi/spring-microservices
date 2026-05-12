@@ -66,4 +66,8 @@ resilience4j:
   timelimiter:
     configs:
       default:
-        timeoutDuration: 5000 # 5 seconds timeout for calls to downstream services
+        timeoutDuration: 10000 # Increasing from 5 to 10 seconds because we are going to
+                               # have many containers running for logging and we may get
+                               # slow response. But in real, our API servers are powerful
+                               # enough, so we may not need to increase it to 10 seconds.
+#        timeoutDuration: 5000 # 5 seconds timeout for calls to downstream services
