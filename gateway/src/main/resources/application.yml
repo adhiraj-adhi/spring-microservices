@@ -43,6 +43,9 @@ management:
       enabled: true # Enable the gateway actuator endpoint to monitor the routes and filters.
       # By default, in Spring Cloud Gateway 4.x and above (Spring Boot 3.x+), the gateway
       # actuator endpoint is disabled for security reasons. We need to explicitly enable it.
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 info:
   app:

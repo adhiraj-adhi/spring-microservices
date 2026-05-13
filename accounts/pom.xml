@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.microservice</groupId>
 	<artifactId>accounts</artifactId>
-	<version>v4.0</version>
+	<version>v5.0</version>
 	<packaging>jar</packaging>
 	<name/>
 	<description/>
@@ -85,6 +85,11 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
