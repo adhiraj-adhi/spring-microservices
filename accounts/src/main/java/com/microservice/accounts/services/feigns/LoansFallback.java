@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Component
 public class LoansFallback implements LoansFeignClient {
     @Override
-    public ResponseEntity<LoansDto> fetchLoanDetails(
-            @RequestHeader("xyz_bank_correlation_id") String correlationIdToken,
-            @RequestParam String mobileNumber) {
+    public ResponseEntity<LoansDto> fetchLoanDetails(@RequestParam String mobileNumber) {
         return null;
     }
 }

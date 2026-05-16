@@ -10,7 +10,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "loans", fallback = LoansFallback.class)
 public interface LoansFeignClient {
     @GetMapping(value = "/api/fetch")
-    public ResponseEntity<LoansDto> fetchLoanDetails(
-            @RequestHeader("xyz_bank_correlation_id") String correlationIdToken,
-            @RequestParam String mobileNumber);
+    public ResponseEntity<LoansDto> fetchLoanDetails(@RequestParam String mobileNumber);
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CardsFallback implements CardsFeignClient {
     @Override
-    public ResponseEntity<CardsDto> fetchCardDetails(String correlationIdToken, String mobileNumber) {
+    public ResponseEntity<CardsDto> fetchCardDetails(String mobileNumber) {
         return null;
     }
 }

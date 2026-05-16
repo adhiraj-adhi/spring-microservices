@@ -49,12 +49,12 @@ public class CustomersController {
     })
     @GetMapping("/fetchCustomerDetails")
     public ResponseEntity<CustomerDetailsDto> fetchCustomerDetails(
-            @RequestHeader(name = "xyz_bank_correlation_id") String correlationIdToken,
             @RequestParam
             @Pattern(regexp = "[0-9]{10}", message = "Mobile Number must be 10 digits")
             String mobileNumber) {
-        logger.debug("Token with Correlation ID xyz_bank_correlation_id: {}", correlationIdToken);
-        CustomerDetailsDto customerDetailsDto = iCustomerService.fetchCompleteCustomerDetails(correlationIdToken, mobileNumber);
+        logger.debug("fetchCustomerDetails method start");
+        CustomerDetailsDto customerDetailsDto = iCustomerService.fetchCompleteCustomerDetails(mobileNumber);
+        logger.debug("fetchCustomerDetails method end");
         return ResponseEntity.ok(customerDetailsDto);
     }
 }

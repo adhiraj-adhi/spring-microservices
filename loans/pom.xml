@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.microservices</groupId>
 	<artifactId>loans</artifactId>
-	<version>v5.0</version>
+	<version>v6.0</version>
 	<packaging>jar</packaging>
 	<name/>
 	<description/>
@@ -30,6 +30,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2025.1.1</spring-cloud.version>
+		<otelVersion>2.26.1</otelVersion>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -81,6 +82,12 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.opentelemetry.javaagent</groupId>
+			<artifactId>opentelemetry-javaagent</artifactId>
+			<version>${otelVersion}</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
