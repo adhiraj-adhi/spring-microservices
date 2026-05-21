@@ -3,14 +3,6 @@ x-network-deploy-service: &network-deploy-service
   networks:
     - XYZBank
 
-x-opentelemetry-env: &opentelemetry-env
-  JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-2.26.1.jar"
-  OTEL_EXPORTER_OTLP_ENDPOINT: "http://tempo:4318"  # This tells OpenTelemetry where to export/send telemetry data.
-    # tempo -> Docker service/container name and 4318 -> default
-  # port for OTLP/gRPC protocol.
-  OTEL_METRICS_EXPORTER: none # This disables metric exporting from OpenTelemetry. We only want to export traces to tempo,
-  # and not metrics because we have Prometheus for that.
-
 x-microservice-base-config: &microservice-base-config
   <<: *network-deploy-service
   deploy:
@@ -33,7 +25,6 @@ x-microservice-config: &microservice-config
       condition: service_healthy
 
 x-microservice-env: &microservice-env
-  <<: *opentelemetry-env
   SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
   SPRING_PROFILES_ACTIVE: "qa"
   EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
@@ -48,78 +39,39 @@ x-gateway-ms-config: &gateway-ms-config
     cards:
       condition: service_healthy
   environment:
-    <<: *opentelemetry-env
     SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:8080/realms/master/protocol/openid-connect/certs"
 
 # defining common-config ends here
 
 # our service definitions start here:
 services:
-  prometheus:
+  keycloak:
     <<: *network-deploy-service
-    image: prom/prometheus:latest
-    command: "--config.file=/etc/prometheus/prometheus.yml"
+    image: "quay.io/keycloak/keycloak:26.6"
+    container_name: "keycloak"
     ports:
-      - 9090:9090
-    volumes:
-      - ../observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-
-  tempo:
-    <<: *network-deploy-service
-    image: grafana/tempo:2.9.0
-    command: "--config.file=/etc/tempo/tempo.yaml"
-    ports:
-      - 3110:3100
-      - 4318:4318
-    volumes:
-      - ../observability/tempo/tempo.yaml:/etc/tempo/tempo.yaml
-
-  grafana:
-    <<: *network-deploy-service
-    image: grafana/grafana:latest
+      - "7080:8080"
     environment:
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-    entrypoint:
-      - sh
-      - -euc
-      - |
-        mkdir -p /etc/grafana/provisioning/datasources
-        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
-        apiVersion: 1
-        datasources:
-          - name: Prometheus
-            type: prometheus
-            access: proxy
-            url: http://prometheus:9090
-          - name: Tempo
-            type: tempo
-            access: proxy
-            url: http://tempo:3100
-        EOF
-        /run.sh
-    ports:
-      - "3000:3000"
+      KC_BOOTSTRAP_ADMIN_USERNAME: "admin"
+      KC_BOOTSTRAP_ADMIN_PASSWORD: "admin"
+    command: start-dev # Using start-dev for development purposes (not recommended for production use).
 
   # Our application services configurations start here:
   configserver:
     <<: *microservice-base-config
-    image: "abhinavyishu/configserver:v6.0"
+    image: "abhinavyishu/configserver:v7.0"
     container_name: "configserver-ms"
     ports:
       - "8071:8071"
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "curl", "-f", "http://localhost:8071/actuator/health/readiness"]
-    environment:
-      <<: *opentelemetry-env
-      OTEL_SERVICE_NAME: "configserver"
 
   eurekaserver:
     <<: *microservice-base-config
-    image: "abhinavyishu/eurekaserver:v6.0"
+    image: "abhinavyishu/eurekaserver:v7.0"
     container_name: "eurekaserver-ms"
     ports:
       - "8070:8070"
@@ -130,55 +82,53 @@ services:
       <<: *healthcheck
       test: [ "CMD", "curl", "-f", "http://localhost:8070/actuator/health/readiness" ]
     environment:
-      <<: *opentelemetry-env
-      OTEL_SERVICE_NAME: "eurekaserver"
       SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
 
   accounts:
     <<: *microservice-config
-    image: "abhinavyishu/accounts:v6.0"
+    image: "abhinavyishu/accounts:v7.0"
     container_name: "accounts-ms"
-    ports:
-      - "8081:8081"
+    # We can remove port mapping for accounts microservices as it is not accessed directly from
+    # outside, but only through gateway. Hence, securing the microservice by not exposing it to
+    # outside world.
     healthcheck:
       <<: *healthcheck
       retries: 20
       test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health/readiness" ]
     environment:
       <<: *microservice-env
-      OTEL_SERVICE_NAME: "accounts"
 
   loans:
     <<: *microservice-config
-    image: "abhinavyishu/loans:v6.0"
+    image: "abhinavyishu/loans:v7.0"
     container_name: "loans-ms"
-    ports:
-      - "8091:8091"
+    # We can remove port mapping for lonas microservices as it is not accessed directly from
+    # outside, but only through gateway. Hence, securing the microservice by not exposing it to
+    # outside world.
     healthcheck:
       <<: *healthcheck
       retries: 20
       test: [ "CMD", "curl", "-f", "http://localhost:8091/actuator/health/readiness" ]
     environment:
       <<: *microservice-env
-      OTEL_SERVICE_NAME: "loans"
 
   cards:
     <<: *microservice-config
-    image: "abhinavyishu/cards:v6.0"
+    image: "abhinavyishu/cards:v7.0"
     container_name: "cards-ms"
-    ports:
-      - "9002:9002"
+    # We can remove port mapping for cards microservices as it is not accessed directly from
+    # outside, but only through gateway. Hence, securing the microservice by not exposing it to
+    # outside world.
     healthcheck:
       <<: *healthcheck
       retries: 20
       test: [ "CMD", "curl", "-f", "http://localhost:9002/actuator/health/readiness" ]
     environment:
       <<: *microservice-env
-      OTEL_SERVICE_NAME: "cards"
 
   gateway-ms:
     <<: *gateway-ms-config
-    image: "abhinavyishu/gateway:v6.0"
+    image: "abhinavyishu/gateway:v7.0"
     container_name: "gateway-ms"
     ports:
       - "8072:8072"
