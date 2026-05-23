@@ -26,6 +26,23 @@ spring:
     openfeign:
       circuitbreaker:
         enabled: true  # Enable circuit breaker for Feign clients
+    stream:
+      bindings:
+        sendCommunication-out-0:
+          destination: send-communication
+            # Defines the logical broker destination where the accounts microservice will publish events.
+            # In RabbitMQ, this typically maps to an Exchange.
+            #
+            # This destination name must match the destination configured by the consumer
+            # microservice (messages service) so that both producer and consumer communicate
+            # through the same RabbitMQ messaging channel.
+  # Define RabbitMQ connection properties
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 10000ms
 
 management:
   endpoints:

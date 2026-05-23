@@ -4,10 +4,27 @@ server:
 spring:
   application:
     name: messages
-#  cloud:
-#    function:
-#      definition: sendEmail|sendSms
-
+  cloud:
+    function:
+      definition: sendEmail|sendSms
+    stream:
+      bindings:
+        sendEmailsendSms-in-0:
+          destination: send-communication # Logical broker destination. In RabbitMQ, this typically maps to an Exchange.
+          group: ${spring.application.name} # Defines the consumer group used for durable queue creation, workload sharing, and fault tolerance.
+          # Based on the destination and group defined above, the RabbitMQ binder will typically:
+          # - create/use an Exchange named: send-communication
+          # - create/use a durable queue named: send-communication.messages
+          #   (since spring.application.name=messages)
+          # - bind the queue to the exchange
+          # - subscribe this microservice to consume messages from that queue
+  # Define RabbitMQ connection properties
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 10000ms
 
 logging:
   level:

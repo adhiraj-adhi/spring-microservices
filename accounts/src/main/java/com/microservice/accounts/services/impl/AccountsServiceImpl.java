@@ -2,6 +2,7 @@ package com.microservice.accounts.services.impl;
 
 import com.microservice.accounts.constants.AccountsConstants;
 import com.microservice.accounts.dtos.AccountsDto;
+import com.microservice.accounts.dtos.AccountsMessageDto;
 import com.microservice.accounts.dtos.CustomerAccountsDto;
 import com.microservice.accounts.dtos.CustomerDto;
 import com.microservice.accounts.entities.Accounts;
@@ -16,6 +17,9 @@ import com.microservice.accounts.repositories.CustomersRepository;
 import com.microservice.accounts.services.IAccountsService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,9 +31,10 @@ import java.util.Random;
 // Since there is only one constructor, Spring automatically uses it for dependency injection,
 // so @Autowired is not required.
 public class AccountsServiceImpl implements IAccountsService {
+    private static final Logger logger = LoggerFactory.getLogger(AccountsServiceImpl.class);
     private AccountsRepository accountsRepository;
     private CustomersRepository customersRepository;
-
+    private StreamBridge streamBridge;
 
     /**
      * @param customerDto - CustomerDto Object
@@ -43,7 +48,43 @@ public class AccountsServiceImpl implements IAccountsService {
         }
         Customer savedCustomer = customersRepository.save(customer);
 
-        accountsRepository.save(createNewAccount(savedCustomer));
+        Accounts savedAccount = accountsRepository.save(createNewAccount(savedCustomer));
+
+        // Publishing the event to bindingName=sendCommunication-out-0:
+
+        // Step 1: Preparing the event payload object that will be sent to RabbitMQ
+        AccountsMessageDto accountsMessageDto = new AccountsMessageDto(
+                savedAccount.getAccountNumber(),
+                savedCustomer.getName(),
+                savedCustomer.getEmail(),
+                savedCustomer.getMobileNumber()
+        );
+        logger.info("Sending communication request for details: {}", accountsMessageDto);
+        // Step 2: Publishing the event to the output binding: sendCommunication-out-0
+        boolean isSent = streamBridge.send("sendCommunication-out-0", accountsMessageDto);
+        /*
+         * send(String bindingName, Object data)
+         *
+         * - bindingName:
+         *   The logical Spring Cloud Stream output binding configured in application.yml.
+         *
+         * - data:
+         *   The payload object to publish.
+         *
+         * Return value:
+         *   Returns true if the message is successfully accepted by the Spring Cloud Stream
+         *   messaging infrastructure for sending.
+         *
+         * Important:
+         *   This does NOT necessarily guarantee that:
+         *   - RabbitMQ consumer processed it,
+         *   - email/SMS was sent,
+         *   - or business processing completed successfully.
+         *
+         * It mainly indicates that the framework successfully handed the message
+         * to the configured messaging channel/binder infrastructure.
+         */
+        logger.info("Is the communication request successfully triggered?: {}", isSent);
     }
 
 
