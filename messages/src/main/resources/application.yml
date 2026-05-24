@@ -18,6 +18,8 @@ spring:
           #   (since spring.application.name=messages)
           # - bind the queue to the exchange
           # - subscribe this microservice to consume messages from that queue
+        sendEmailsendSms-out-0:
+          destination: communication-sent
   # Define RabbitMQ connection properties
   rabbitmq:
     host: localhost
