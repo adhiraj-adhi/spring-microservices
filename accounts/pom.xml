@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.microservice</groupId>
 	<artifactId>accounts</artifactId>
-	<version>v7.0</version>
+	<version>v8.0</version>
 	<packaging>jar</packaging>
 	<name/>
 	<description/>

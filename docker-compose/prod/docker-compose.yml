@@ -58,10 +58,20 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: "admin"
     command: start-dev # Using start-dev for development purposes (not recommended for production use).
 
+  rabbitmq:
+    <<: *network-deploy-service
+    image: "rabbitmq:3-management"
+    container_name: "rabbitmq"
+    ports:
+      - "5672:5672" # RabbitMQ default port for messaging
+      - "15672:15672" # RabbitMQ management UI port
+    environment:
+      - CONNECTION_TIMEOUT=10000ms
+
   # Our application services configurations start here:
   configserver:
     <<: *microservice-base-config
-    image: "abhinavyishu/configserver:v7.0"
+    image: "abhinavyishu/configserver:v8.0"
     container_name: "configserver-ms"
     ports:
       - "8071:8071"
@@ -71,7 +81,7 @@ services:
 
   eurekaserver:
     <<: *microservice-base-config
-    image: "abhinavyishu/eurekaserver:v7.0"
+    image: "abhinavyishu/eurekaserver:v8.0"
     container_name: "eurekaserver-ms"
     ports:
       - "8070:8070"
@@ -86,7 +96,7 @@ services:
 
   accounts:
     <<: *microservice-config
-    image: "abhinavyishu/accounts:v7.0"
+    image: "abhinavyishu/accounts:v8.0"
     container_name: "accounts-ms"
     # We can remove port mapping for accounts microservices as it is not accessed directly from
     # outside, but only through gateway. Hence, securing the microservice by not exposing it to
@@ -97,10 +107,11 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health/readiness" ]
     environment:
       <<: *microservice-env
+      SPRING_RABBITMQ_HOST: "rabbitmq"
 
   loans:
     <<: *microservice-config
-    image: "abhinavyishu/loans:v7.0"
+    image: "abhinavyishu/loans:v8.0"
     container_name: "loans-ms"
     # We can remove port mapping for lonas microservices as it is not accessed directly from
     # outside, but only through gateway. Hence, securing the microservice by not exposing it to
@@ -114,7 +125,7 @@ services:
 
   cards:
     <<: *microservice-config
-    image: "abhinavyishu/cards:v7.0"
+    image: "abhinavyishu/cards:v8.0"
     container_name: "cards-ms"
     # We can remove port mapping for cards microservices as it is not accessed directly from
     # outside, but only through gateway. Hence, securing the microservice by not exposing it to
@@ -128,10 +139,17 @@ services:
 
   gateway-ms:
     <<: *gateway-ms-config
-    image: "abhinavyishu/gateway:v7.0"
+    image: "abhinavyishu/gateway:v8.0"
     container_name: "gateway-ms"
     ports:
       - "8072:8072"
+
+  messages:
+    <<: *microservice-config
+    image: "abhinavyishu/messages:v8.0"
+    container_name: "messages-ms"
+    environment:
+      SPRING_RABBITMQ_HOST: "rabbitmq"
 
 # defining the network
 networks:
