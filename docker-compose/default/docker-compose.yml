@@ -25,9 +25,9 @@ x-microservice-config: &microservice-config
       condition: service_healthy
 
 x-microservice-env: &microservice-env
-    SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
-    SPRING_PROFILES_ACTIVE: "default"
-    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
+  SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071"
+  SPRING_PROFILES_ACTIVE: "default"
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka/"
 
 x-gateway-ms-config: &gateway-ms-config
   <<: *microservice-base-config

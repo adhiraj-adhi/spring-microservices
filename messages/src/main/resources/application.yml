@@ -8,25 +8,22 @@ spring:
     function:
       definition: sendEmail|sendSms
     stream:
+      kafka:
+        binder:
+          brokers: localhost:9092 # Kafka broker address
       bindings:
         sendEmailsendSms-in-0:
-          destination: send-communication # Logical broker destination. In RabbitMQ, this typically maps to an Exchange.
+          destination: send-communication # Logical broker destination. In Kafka, this maps to a topic named "send-communication".
           group: ${spring.application.name} # Defines the consumer group used for durable queue creation, workload sharing, and fault tolerance.
-          # Based on the destination and group defined above, the RabbitMQ binder will typically:
-          # - create/use an Exchange named: send-communication
-          # - create/use a durable queue named: send-communication.messages
+          # Based on the destination and group defined above, the Kafka binder will typically:
+          # - create/use a topic named: send-communication
+          # - register this microservice as part of consumer group: messages
           #   (since spring.application.name=messages)
-          # - bind the queue to the exchange
-          # - subscribe this microservice to consume messages from that queue
+          # - track consumed message offsets for this consumer group
+          # - allow horizontal scaling by distributing messages across multiple instances
+          # - automatically resume consumption from the last committed offset after restart
         sendEmailsendSms-out-0:
           destination: communication-sent
-  # Define RabbitMQ connection properties
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-    connection-timeout: 10000ms
 
 logging:
   level:
